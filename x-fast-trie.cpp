@@ -110,6 +110,45 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> hash){
     return temp;
 }
 
+struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> hash){
+    int l, h, m, pre ;
+    l = 0 ;
+    h = w + 1 ;
+    struct node *temp = NULL ;        
+    
+    // Binary search of levels
+    while( h - l > 1){
+        m = (l + h)/2;
+        pre = x / _pow(2, w - m);  //this will store common prefix upto mid level, 
+        if(hash[m].find(pre) == hash[m].end()){
+            h = m ;//common prefix maybe in the upward section of mid
+        }
+        else{
+            l = m ;
+            temp = hash[m][pre] ;  //aage jaane ke liye root lena padega             
+        }
+    }
+    
+    if( temp == NULL || temp-> level == 0){
+        return NULL;
+    }
+
+    if(temp->level == w){
+        return temp ;
+    }
+
+    if((x / _pow(2, w - temp->level -1)) & 1){
+        temp = temp->right ;
+    }else{
+        temp = temp->left ;
+    }
+
+    if(temp->data > x){
+        return temp->left;
+    }
+    return temp;
+}
+
 int main(){
     int w , u;
     vector<unordered_map<int,node*>> hash;
