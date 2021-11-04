@@ -55,8 +55,20 @@ struct node* get_Rightmost_Node(struct node* root, int w){
     return root ;
 }
 
-
+struct node* find(int x,int w,vector<unordered_map<int,node*>> hash){
+    if(hash[w].find(x) == hash[w].end()){
+      return NULL;
+    }
+    return hash[w][x];
+}
 
 int main(){
-
+    int w , u;
+    vector<unordered_map<int,node*>> hash;
+    cin >> u ;
+    w= bitCount(u);
+    hash.assign(w+1,unordered_map<int,node*>());
+    struct node* root = new node();
+    root->level=0;
+    hash[0][0] = root ;
 }
