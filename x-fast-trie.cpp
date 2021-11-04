@@ -149,6 +149,78 @@ struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> hash){
     return temp;
 }
 
+void insert_node(int x, int w, vector<unordered_map<int,node*>> hash){
+    struct node *hash_node = new node() ;
+    hash_node->data = x ;
+    hash_node->level = w ;   
+    
+    struct node *p = predecessor(x,w,hash);
+    struct node *s = successor(x,w,hash);
+    if(p != NULL){
+        if(p->level != w){
+            cout << "Unexpected level" << "\n" ; //revisit this
+        }
+        hash_node->right = p->right ;
+        p->right = hash_node ;
+        hash_node->left = p ;
+    }
+
+    if(s != NULL){
+        if(s->level != w){
+            cout << "Unexpected level" << "\n" ; //revisit this
+        }
+        hash_node->left = s->left ;
+        s->left = hash_node ;
+        hash_node->right = s ;
+    }
+    
+    
+    int level = 1, pre;
+    while(level!=w){
+        pre = x / _pow(2,w-level);
+        if(hash[level].find(pre) == hash[level].end()){
+            struct node *inner = new node();
+            inner->level = level;
+            hash[level][pre] = inner;
+            if(pre & 1){
+                hash[level-1][pre/2]->right = inner;
+            }
+            else{
+                hash[level-1][pre/2]->left = inner ;
+            }
+        }
+        ++level;
+    }
+    hash[w][x] = hash_node;
+    // establishing connection between last and second last level
+    if(x & 1){
+        hash[w-1][x/2]->right = hash_node;
+    }
+    else{
+        hash[w-1][x/2]->left = hash_node;
+    }
+
+    //threading
+    pre = x ;
+    level = w - 1 ;
+    // level
+    while(level != 0){
+        pre = pre>>1 ;
+        if(hash[level][pre]->left == NULL)
+            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+        else
+            hash[level][pre]->right = get_Leftmost_Node(hash[level][pre]->left,w) ;
+        --level ;
+    }   
+
+    if(hash[0][0]->left == NULL){
+        hash[0][0]->left = get_Leftmost_Node(hash[0][0]->right,w);
+    }
+    if(hash[0][0]->right == NULL){
+        hash[0][0]->right = get_Rightmost_Node(hash[0][0]->left,w);
+    }
+}
+
 int main(){
     int w , u;
     vector<unordered_map<int,node*>> hash;
