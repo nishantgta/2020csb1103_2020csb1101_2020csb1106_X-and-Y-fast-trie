@@ -43,7 +43,7 @@ int right_children(int x){
 
 struct node* get_Leftmost_Node(struct node* root,int w){
     while(root->level!= w){
-        if(root->left=NULL){
+        if(root->left==NULL){
             root=root->left;
         }
         else{
@@ -205,7 +205,7 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     level = w - 1 ;
     // level
     while(level != 0){
-        pre = pre>>1 ;
+        pre = pre/2 ;
         if(hash[level][pre]->left == NULL)
             hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
         else
@@ -219,6 +219,46 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     if(hash[0][0]->right == NULL){
         hash[0][0]->right = get_Rightmost_Node(hash[0][0]->left,w);
     }
+}
+
+void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
+    struct node* temp = find(x,w,hash);
+    struct node* s = successor(x,w,hash);
+    struct node* p = predecessor(x,w,hash);
+    p->right = s ;
+    s->left = p ;
+
+    int pre = x ;
+    int pprev;
+    int level = w - 1 ;
+    while(level != 0){
+        pprev=pre;
+        pre = pre/2 ;
+        if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
+        {   
+            hash[level+1][pprev]=NULL;
+            //you have reached branch node :)
+            break;
+        }
+        else{
+            hash[level+1][pprev]=NULL;
+        }
+        if(hash[level][pre]->left == NULL)
+            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+        else
+            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+        --level ;
+    } 
+    pre=pprev;
+    while(level != 0){
+    pre = pre/2 ;
+    if(hash[level][pre]->left == NULL)
+        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+    else
+        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+    --level ;
+    }   
+
 }
 
 int main(){
@@ -245,6 +285,11 @@ int main(){
     }
 
     temp = predecessor(2,w,hash);
+    if(temp!=NULL){
+        cout<<temp->data<<"\n";
+    }
+    delete_node(5,w,hash) ;
+    temp = successor(2,w,hash);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
