@@ -64,14 +64,14 @@ struct node* get_Rightmost_Node(struct node* root, int w){
     return root ;
 }
 
-struct node* find(int x,int w,vector<unordered_map<int,node*>> hash){
+struct node* find(int x,int w,vector<unordered_map<int,node*>> &hash){
     if(hash[w].find(x) == hash[w].end()){
       return NULL;
     }
     return hash[w][x];
 }
 
-struct node* successor(int x, int w, vector<unordered_map<int,node*>> hash){
+struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
     int l, h, m, pre ;
     l = 0 ;
     h = w + 1 ;
@@ -110,7 +110,7 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> hash){
     return temp;
 }
 
-struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> hash){
+struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
     int l, h, m, pre ;
     l = 0 ;
     h = w + 1 ;
@@ -149,7 +149,7 @@ struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> hash){
     return temp;
 }
 
-void insert_node(int x, int w, vector<unordered_map<int,node*>> hash){
+void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     struct node *hash_node = new node() ;
     hash_node->data = x ;
     hash_node->level = w ;   
@@ -209,7 +209,7 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> hash){
         if(hash[level][pre]->left == NULL)
             hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
         else
-            hash[level][pre]->right = get_Leftmost_Node(hash[level][pre]->left,w) ;
+            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
         --level ;
     }   
 
@@ -224,10 +224,28 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> hash){
 int main(){
     int w , u;
     vector<unordered_map<int,node*>> hash;
+    cout<<"Enter the size of the universe"<<"\n";
     cin >> u ;
     w= bitCount(u);
     hash.assign(w+1,unordered_map<int,node*>());
     struct node* root = new node();
     root->level=0;
     hash[0][0] = root ;
+    
+    insert_node(5,w,hash);
+    insert_node(11,w,hash);
+    insert_node(12,w,hash);
+    insert_node(1,w,hash);
+    insert_node(6,w,hash);
+    insert_node(7,w,hash);
+
+    struct node *temp = successor(2,w,hash);
+    if(temp!=NULL){
+        cout<<temp->data<<"\n";
+    }
+
+    temp = predecessor(2,w,hash);
+    if(temp!=NULL){
+        cout<<temp->data<<"\n";
+    }
 }
