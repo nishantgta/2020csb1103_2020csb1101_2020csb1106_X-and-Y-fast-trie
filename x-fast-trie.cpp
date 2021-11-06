@@ -234,6 +234,11 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     while(level != 0){
         pprev=pre;
         pre = pre/2 ;
+        if(hash[level][pre]->left == NULL)
+            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+        else
+            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+            
         if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
         {   
             hash[level+1][pprev]=NULL;
@@ -243,10 +248,6 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         else{
             hash[level+1][pprev]=NULL;
         }
-        if(hash[level][pre]->left == NULL)
-            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-        else
-            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
         --level ;
     } 
     pre=pprev;
@@ -288,9 +289,9 @@ int main(){
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
-    delete_node(5,w,hash) ;
+    /*delete_node(5,w,hash) ;
     temp = successor(2,w,hash);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
-    }
+    }*/
 }
