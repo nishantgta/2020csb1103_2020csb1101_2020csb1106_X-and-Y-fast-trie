@@ -49,8 +49,8 @@ struct node* get_Leftmost_Node(struct node* root,int w){
         else{
             root=root->right;   
         }
-        return root;
     }
+    return root;
 }
 
 struct node* get_Rightmost_Node(struct node* root, int w){
@@ -208,7 +208,7 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
         pre = pre/2 ;
         if(hash[level][pre]->left == NULL)
             hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-        else
+        else if(hash[level][pre]->right == NULL)
             hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
         --level ;
     }   
@@ -233,12 +233,8 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     int level = w - 1 ;
     while(level != 0){
         pprev=pre;
-        pre = pre/2 ;
-        if(hash[level][pre]->left == NULL)
-            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-        else
-            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
-            
+        pre = pre/2 ;   
+        temp=hash[level+1][pprev];
         if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
         {   
             hash[level+1][pprev]=NULL;
@@ -255,11 +251,11 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     pre = pre/2 ;
     if(hash[level][pre]->left == NULL)
         hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-    else
+    else if(hash[level][pre]->right == NULL)
         hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
     --level ;
     }   
-
+    
 }
 
 int main(){
@@ -289,9 +285,9 @@ int main(){
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
-    /*delete_node(5,w,hash) ;
-    temp = successor(2,w,hash);
+    delete_node(5,w,hash);
+    temp = predecessor(2,w,hash);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
-    }*/
+    }
 }
