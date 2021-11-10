@@ -66,7 +66,7 @@ struct node* get_Rightmost_Node(struct node* root, int w){
 
 struct node* find(int x,int w,vector<unordered_map<int,node*>> &hash){
     if(hash[w].find(x) == hash[w].end()){
-      return NULL;
+        return NULL;
     }
     return hash[w][x];
 }

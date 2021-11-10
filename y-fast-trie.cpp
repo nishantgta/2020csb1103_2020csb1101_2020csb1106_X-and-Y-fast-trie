@@ -1,6 +1,8 @@
 #include<iostream>
 #include<unordered_map>
 #include<vector>
+#include<map>
+#include<iterator>
 using namespace std;
 
 struct node {
@@ -258,9 +260,32 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     else
         hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
     --level ;
-    }   
-
+    }
 }
+
+void insert_bst(int x, int val, map <int, int> bst){
+    bst[x] = val ;
+}
+
+int successor_bst(int x, map <int, int> bst){
+    map <int, int> :: iterator temp = bst.lower_bound(x) ;
+    if(temp == bst.end()){
+        return -1 ;
+    }
+    else{
+        return temp->first ;
+    }
+}
+
+int predecessor_bst(int x, map <int, int> bst){
+    map <int, int> :: iterator temp = bst.upper_bound(x) ;
+    if(temp == bst.begin()){
+        return -1 ;
+    }
+    temp = prev(temp);
+    return temp->first ;
+}
+
 
 int main(){
     int w , u;
