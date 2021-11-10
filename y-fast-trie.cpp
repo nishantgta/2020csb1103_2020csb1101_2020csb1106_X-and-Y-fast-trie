@@ -287,6 +287,29 @@ int predecessor_bst(int x, map <int, int> bst){
 }
 
 
+int find_y_trie(int w, int x, unordered_map<int, map<int,int> > bst, vector<unordered_map<int,node*>> &x_fast){
+    struct node * suc = successor(x, w, x_fast) ; 
+    struct node *pre = predecessor(x, w , x_fast) ;   
+    if(bst[suc->data].find(x) != bst[suc->data].end()) {
+        return bst[suc->data][x] ;
+    }
+    if(bst[pre->data].find(x) != bst[pre->data].end())
+    {
+        return bst[pre->data][x] ;
+    }
+    return -1 ;
+}
+
+int successor_y_fast(int w, int x, unordered_map<int, map<int,int> > bst, vector<unordered_map<int,node*>> &x_fast){
+    struct node * suc = successor(x, w, x_fast) ; 
+    struct node *pre = predecessor(x, w , x_fast) ;
+    int a = _pow(2,w) ;
+    int b = _pow(2,w) ;
+    if(suc != NULL) a = successor_bst(x, bst[suc->data]);
+    if(pre != NULL) b = successor_bst(x, bst[pre->data]);
+    return (a < b) ? a : b;
+}
+
 int main(){
     int w , u;
     vector<unordered_map<int,node*>> hash;
