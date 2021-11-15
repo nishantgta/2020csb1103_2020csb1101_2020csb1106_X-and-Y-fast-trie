@@ -2,12 +2,13 @@
 #include<iostream>
 #include<unordered_map>
 #include<vector>
+#include<map>
+#include<iterator>
 using namespace std;
 
 // Defining the node for x-fast trie containing data, level
-// and a left pointer and a right pointer. It also has a default
-// constructor 
-struct node {   //node of struct type will represent the node in our trie data structure
+// and a left pointer and a right pointer. It also has a default constructor. 
+struct node {   //node of struct type will represent the node in our trie data structure.
     int data;
     int level;
     struct node * left, *right ;
@@ -80,15 +81,15 @@ struct node* get_Rightmost_Node(struct node* root, int w){
 }
 
 // This function find the key in the x-fast trie
-struct node* find(int x,int w,vector<unordered_map<int,node*>> &hash){
-    if(hash[w].find(x) == hash[w].end()){
-        return NULL;
+struct node* find(int x,int w,vector<unordered_map<int,node*>> &xfast){
+    if(xfast[w].find(x) == xfast[w].end()){
+      return NULL;
     }
-    return hash[w][x];
+    return xfast[w][x];
 }
 
 // This function will return successor node in our trie corresponding to a given value
-struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
+struct node* successor(int x, int w, vector<unordered_map<int,node*>> &xfast){
     int l, h, m, pre ;
     l = 0 ;
     h = w + 1 ;
@@ -98,12 +99,12 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
     while( h - l > 1){
         m = (l + h)/2;
         pre = x / _pow(2, w - m);  //this will store common prefix upto mid level, 
-        if(hash[m].find(pre) == hash[m].end()){
+        if(xfast[m].find(pre) == xfast[m].end()){
             h = m ;//common prefix maybe in the upward section of mid
         }
         else{
             l = m ;
-            temp = hash[m][pre] ;  //aage jaane ke liye root lena padega
+            temp = xfast[m][pre] ;  //aage jaane ke liye root lena padega
         }
     }
     
@@ -128,7 +129,7 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
 }
 
 // This function will return successor node in our trie corresponding to a given value
-struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
+struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &xfast){
     int l, h, m, pre ;
     l = 0 ;
     h = w + 1 ;
@@ -138,12 +139,12 @@ struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
     while( h - l > 1){
         m = (l + h)/2;
         pre = x / _pow(2, w - m);  //this will store common prefix upto mid level, 
-        if(hash[m].find(pre) == hash[m].end()){
+        if(xfast[m].find(pre) == xfast[m].end()){
             h = m ;//common prefix maybe in the upward section of mid
         }
         else{
             l = m ;
-            temp = hash[m][pre] ;  //if the common prefix is in the downward section, we wi            
+            temp = xfast[m][pre] ;  //if the common prefix is in the downward section, we wi            
         }
     }
     
@@ -174,13 +175,13 @@ struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
 
 // This function adds a key to the x-fast trie 
 // It will create a new node, find a suitable place for it in the existing trie and links other nodes to it.
-void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
+void insert_node(int x, int w, vector<unordered_map<int,node*>> &xfast){
     struct node *hash_node = new node() ;  //hash node will represent the node to be inserted
     hash_node->data = x ;
     hash_node->level = w ;   
     
-    struct node *p = predecessor(x,w,hash);  //p will have predecessor
-    struct node *s = successor(x,w,hash);    //s will have successor
+    struct node *p = predecessor(x,w,xfast);  //p will have predecessor
+    struct node *s = successor(x,w,xfast);    //s will have successor
     if(p != NULL){
         if(p->level != w){
             cout << "Unexpected level" << "\n" ; 
@@ -205,27 +206,26 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     int level = 1, pre;
     while(level!=w){
         pre = x / _pow(2,w-level);
-        if(hash[level].find(pre) == hash[level].end()){
+        if(xfast[level].find(pre) == xfast[level].end()){
             struct node *inner = new node();
             inner->level = level;
-            inner->data = pre;
-            hash[level][pre] = inner;
+            xfast[level][pre] = inner;
             if(pre & 1){
-                hash[level-1][pre/2]->right = inner;
+                xfast[level-1][pre/2]->right = inner;
             }
             else{
-                hash[level-1][pre/2]->left = inner ;
+                xfast[level-1][pre/2]->left = inner ;
             }
         }
         ++level;
     }
-    hash[w][x] = hash_node;
+    xfast[w][x] = hash_node;
     // establishing connection between last and second last level
     if(x & 1){
-        hash[w-1][x/2]->right = hash_node;
+        xfast[w-1][x/2]->right = hash_node;
     }
     else{
-        hash[w-1][x/2]->left = hash_node;
+        xfast[w-1][x/2]->left = hash_node;
     }
 
     //threading
@@ -234,141 +234,182 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     // we are creating descendent pointers, if a node has a missing left or right child 
     while(level != 0){
         pre = pre/2 ;
-        if(hash[level][pre]->left == NULL)
-            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;  
+        if(xfast[level][pre]->left == NULL)
+            xfast[level][pre]->left = get_Leftmost_Node(xfast[level][pre]->right, w) ;  
             //if a node has a missing left child, then it will point to the left most leaf of its right child 
-        else if(hash[level][pre]->right == NULL)
-            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;  
+        else if(xfast[level][pre]->right == NULL)
+            xfast[level][pre]->right = get_Rightmost_Node(xfast[level][pre]->left,w) ;  
             //if a node has a missing right child, then it will point to the right most leaf of its left child
         --level ;
     }   
 
-    if(hash[0][0]->left == NULL){
-        hash[0][0]->left = get_Leftmost_Node(hash[0][0]->right,w);
+    if(xfast[0][0]->left == NULL){
+        xfast[0][0]->left = get_Leftmost_Node(xfast[0][0]->right,w);
     }
-    if(hash[0][0]->right == NULL){
-        hash[0][0]->right = get_Rightmost_Node(hash[0][0]->left,w);
+    if(xfast[0][0]->right == NULL){
+        xfast[0][0]->right = get_Rightmost_Node(xfast[0][0]->left,w);
     }
 }
 
-void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
-    struct node* temp = find(x,w,hash);
-    struct node* s = temp->right;
-    struct node* p = temp->left;
-    if(p!=NULL){
-       if(s!=NULL){
-          p->right = s ;
-          s->left = p ;
-       }
-       else{
-           p->right=NULL;
-       }
+// This function inserts the value into the bst
+void insert_bst(int x, int val, map <int, int> bst){
+    bst[x] = val ;
+}
+
+// Implementing the successor functionality for the bst
+int successor_bst(int x, map <int, int> bst){
+    map <int, int> :: iterator temp = bst.lower_bound(x) ;
+    // If we reach the end of bst, it means successor of element is not present
+    if(temp == bst.end()){
+        return -1 ;
     }
     else{
-       if(s!=NULL){
-           s->left=NULL;
-       }
+        return temp->first ;
     }
+}
 
-    int pre = x ;
-    int pprev;
-    int level = w - 1 ;
-    while(level != 0){
-        pprev=pre;
-        pre = pre/2 ;   
-        temp=hash[level+1][pprev];
-        if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
-        {   
-            temp=hash[level+1][pprev];
-            //cout<<temp->data<<"\n";
-            //cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
-            hash[level+1][pprev]=NULL;
-            free(temp);
-            //you have reached branch node :)
-            break;
-        }
-        else{
-            temp=hash[level+1][pprev];
-            //cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
-            hash[level+1][pprev]=NULL;
-            free(temp);
-        }
-        --level ;
-    } 
-    pre=pprev;
-    while(level != 0){
-        pre = pre/2 ;
-        if(hash[level][pre]->left == NULL)
-            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-        else if(hash[level][pre]->right == NULL)
-            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
-        --level ;
+// Implementing the pre functionality for the bst
+int predecessor_bst(int x, map <int, int> bst){
+    map <int, int> :: iterator temp = bst.upper_bound(x) ;
+    // If we reach the front of bst, it means predecessor of element is not present
+    if(temp == bst.begin()){
+        return -1 ;
     }
-    if (s != NULL) {
-        pre = s->data;
-        level = w - 1;
-        while (level != 0) {
-            pre = pre / 2;
-            if (hash[level][pre]->left == NULL)
-                hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
-            else if (hash[level][pre]->right == NULL)
-                hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
-            --level;
-        }
+    temp = prev(temp);
+    return temp->first ;
+}
+
+// This will find the element the specified element in our trie, and return whether its present or not
+int find_y_trie(int w, int x, unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
+    struct node * suc = successor(x, w, x_fast) ; 
+    struct node *pre = predecessor(x, w , x_fast) ;
+    //finding element in the bst's of successor representative   
+    if(bst[suc->data].find(x) != bst[suc->data].end()) {
+        return bst[suc->data][x] ;
     }
-    if (p != NULL) {
-        pre = p->data;
-        level = w - 1;
-        while (level != 0) {
-            pre = pre / 2;
-            if (hash[level][pre]->left == NULL)
-                hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
-            else if (hash[level][pre]->right == NULL)
-                hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
-            --level;
-        }
+    if(bst[pre->data].find(x) != bst[pre->data].end())
+    {
+        return bst[pre->data][x] ;
+    }
+    return -1 ;
+}
+
+// This will find the successor in the y-fast-trie
+int successor_y_fast(int w, int x, unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
+    // This will find the successor and predecessor in the x-fast trie 
+    // and find the successor in both the binary search trees
+    // and return the smaller value from both of them.
+    struct node * suc = successor(x, w, x_fast) ; 
+    struct node *pre = predecessor(x, w , x_fast) ;
+    int a = _pow(2,w) ;
+    int b = _pow(2,w) ;
+    if(suc != NULL) a = successor_bst(x, bst[suc->data]);
+    if(pre != NULL) b = successor_bst(x, bst[pre->data]);
+    return (a < b) ? a : b;
+}
+
+// This will find the predecessor in the y-fast-trie
+int predecessor_y_fast(int w, int x, unordered_map<int, map<int,int>> &bst, vector<unordered_map<int,node*>> &x_fast){
+    // This will find the successor and predecessor in the x-fast trie 
+    // and find the predecessor in both the binary search trees
+    // and return the larger value from both of them.
+    struct node * suc = successor(x, w, x_fast) ; 
+    struct node *pre = predecessor(x, w , x_fast) ;
+    int a = -_pow(2,w) ;
+    int b = -_pow(2,w) ;
+    if(suc != NULL) a = predecessor_bst(x, bst[suc->data]);
+    if(pre != NULL) b = predecessor_bst(x, bst[pre->data]);
+    return (a > b) ? a : b;
+}
+
+// This function will add the key to y-fast trie.
+void insert_y_fast(int w, int x,unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
+    struct node * suc = successor(x, w, x_fast) ;
+    if(suc == NULL){ //if any element is not having successor, i.e. it is largest at a given time, then we will make it as representative
+        insert_node(x, w, x_fast);   //this will make the given value as representative of the BST
+        (bst[x])[x] = x;  
+    }
+    else { //if it has a representative then insert it in the appropriate BST.
+        int s = suc->data ;
+        bst[s][x] = x; 
     }
 }
 
 int main(){
-    // u is the universe size
-    // w is the bit count of u, no of of bits in u
-    int w , u;
-    
-    // Creating the x-fast trie
+    int w , u, c, n;
     vector<unordered_map<int,node*>> xfast;
-    
-    // Taking input from user regarding size of universe
-    cout<<"Enter the size of the universe"<<"\n";
+    cout<<"Enter the size of the universe: ";
     cin >> u ;
-    
-    // Initialising x-fast trie
-    w= bitCount(u);
+    w = bitCount(u);
     xfast.assign(w+1,unordered_map<int,node*>());
     struct node* root = new node();
     root->level=0;
-    root->data=0;
     xfast[0][0] = root ;
     
-    insert_node(5,w,xfast);
-    insert_node(11,w,xfast);
-    insert_node(12,w,xfast);
-    insert_node(1,w,xfast);
-    insert_node(6,w,xfast);
-    insert_node(7,w,xfast);
+    unordered_map<int,map<int,int>> ytrie;
 
-    struct node *temp = successor(2,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
+    while(true){
+        cout << "---MENU---" << "\n" ;
+        cout << "Press 1 to insert\n" ;
+        cout << "Press 2 to print predecessor\n" ;
+        cout << "Press 3 to print successor\n" ;
+        cout << "Press 4 to search for a given element\n" ;
+        cout << "Press 5 to Exit\n" ;
+        cout << "Enter your choice: " ;
+        cin >> c ;
+        if(c==1){
+            cout << "Enter element to insert: " ;
+            cin >> n ;
+            if (n>u){
+                cout<<"Enter element less than "<<u<<"\n";
+            }
+            else{
+                insert_y_fast(w,n,ytrie,xfast) ;
+            }
+        }
+        else if(c==2){
+            cout << "Enter the value: " ;
+            cin >> n ;
+            cout<<"Predecessor of the key "<<n<< ": ";
+            int key = predecessor_y_fast(w,n,ytrie,xfast);
+            if(key!=-1){
+                cout<<key<<"\n";
+            }
+            else {
+                cout<<" Predecessor of the key "<<n<< " is not present\n";
+            }
+        }
+        else if(c==3){
+            cout << "Enter the value: " ;
+            cin >> n ;
+            cout<<"Successor of the key "<<n<< ": ";
+            int key = successor_y_fast(w,n,ytrie,xfast);
+            if(key!=-1){
+                cout<<key<<"\n";
+            }
+            else {
+                cout<<" Successor of the key "<<n<< " is not present\n";
+            }
+        }
+        else if(c==4){
+            cout << "Enter the element to be searched: ";
+            cin >> n;
+            if(find_y_trie(w, n, ytrie, xfast) != -1){
+                cout<<"Element is present\n";
+            }
+            else{
+                cout<<"Element not present\n";
+            }
+        }
+        else if(c==5){
+            break;
+        }
+        else{
+            cout<<"Invalid Input";
+        }
     }
-
-    temp = predecessor(2,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }
-    delete_node(7,w,xfast);
-    temp = predecessor(8,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }
+    return 0;
 }
+
+
+

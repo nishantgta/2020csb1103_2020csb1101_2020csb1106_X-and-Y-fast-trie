@@ -281,6 +281,7 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         {   
             temp=hash[level+1][pprev];
             hash[level+1][pprev]=NULL;
+            hash[level+1].erase(pprev);
             free(temp);
             //you have reached branch node :)
             break;
@@ -288,10 +289,12 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         else{
             temp=hash[level+1][pprev];
             hash[level+1][pprev]=NULL;
+            hash[level+1].erase(pprev);
             free(temp);
         }
         --level ;
     } 
+    level--;
     pre=pprev;
     while(level != 0){
         pre = pre/2 ;
@@ -325,6 +328,7 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
             --level;
         }
     }
+    1;
 }
 
 int main(){
@@ -346,26 +350,76 @@ int main(){
     root->level=0;
     root->data=0;
     xfast[0][0] = root ;
-    
-    insert_node(5,w,xfast);
-    insert_node(11,w,xfast);
-    insert_node(12,w,xfast);
-    insert_node(1,w,xfast);
-    insert_node(6,w,xfast);
-    insert_node(7,w,xfast);
-
-    struct node *temp = successor(2,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }
-
-    temp = predecessor(2,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }
-    delete_node(7,w,xfast);
-    temp = predecessor(8,w,xfast);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
+    int n,c;
+    while(true){
+        cout << "---MENU---" << "\n" ;
+        cout << "Press 1 to insert\n" ;
+        cout << "Press 2 to print predecessor\n" ;
+        cout << "Press 3 to print successor\n" ;
+        cout << "Press 4 to search for a given element\n" ;
+        cout << "Press 5 to delete a given element\n" ;
+        cout << "Press 6 to Exit\n" ;
+        cout << "Enter your choice: " ;
+        cin >> c ;
+        if(c==1){
+            cout << "Enter element to insert: " ;
+            cin >> n ;
+            if (n>u){
+                cout<<"Enter element less than "<<u<<"\n";
+            }
+            else{
+                insert_node(n,w,xfast);
+            }
+        }
+        else if(c==2){
+            cout << "Enter the value: " ;
+            cin >> n ;
+            cout<<"Predecessor of the key "<<n<< ": ";
+            struct node* key = predecessor(n,w,xfast);
+            if(key==NULL){
+                cout<<" Predecessor of the key "<<n<< " is not present\n";
+            }
+            else {
+                cout<<" Predecessor of the key "<<n<<" is "<<key->data<<"\n";
+            }
+        }
+        else if(c==3){
+            cout << "Enter the value: " ;
+            cin >> n ;
+            cout<<"Successor of the key "<<n<< ": ";
+            struct node* key = successor(n,w,xfast);
+            if(key==NULL){
+                cout<<" Successor of the key "<<n<< " is not present\n";
+            }
+            else {
+                cout<<" Successor of the key "<<n<<" is "<<key->data<<"\n";
+            }
+        }
+        else if(c==4){
+            cout << "Enter the element to be searched: ";
+            cin >> n;
+            if(find(n,w,xfast) != NULL){
+                cout<<"Element is present\n";
+            }
+            else{
+                cout<<"Element not present\n";
+            }
+        }
+        else if(c==5){
+            cout << "Enter element to be deleted" ;
+            cin >> n ;
+            if(find(n,w,xfast) == NULL){
+                cout << "Element is not present\n" ;
+            }
+            else {
+                delete_node(n,w,xfast);
+            }
+        }
+        else if(c==6){
+            break;
+        }
+        else{
+            cout<<"Invalid Input";
+        }
     }
 }
