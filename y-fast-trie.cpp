@@ -51,8 +51,8 @@ struct node* get_Leftmost_Node(struct node* root,int w){
         else{
             root=root->right;   
         }
-        return root;
     }
+    return root;
 }
 
 struct node* get_Rightmost_Node(struct node* root, int w){
@@ -286,7 +286,7 @@ int predecessor_bst(int x, map <int, int> bst){
     return temp->first ;
 }
 
-int find_y_trie(int w, int x, unordered_map<int, map<int,int> > bst, vector<unordered_map<int,node*>> &x_fast){
+int find_y_trie(int w, int x, unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
     struct node * suc = successor(x, w, x_fast) ; 
     struct node *pre = predecessor(x, w , x_fast) ;   
     if(bst[suc->data].find(x) != bst[suc->data].end()) {
@@ -299,7 +299,7 @@ int find_y_trie(int w, int x, unordered_map<int, map<int,int> > bst, vector<unor
     return -1 ;
 }
 
-int successor_y_fast(int w, int x, unordered_map<int, map<int,int> > bst, vector<unordered_map<int,node*>> &x_fast){
+int successor_y_fast(int w, int x, unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
     struct node * suc = successor(x, w, x_fast) ; 
     struct node *pre = predecessor(x, w , x_fast) ;
     int a = _pow(2,w) ;
@@ -309,7 +309,7 @@ int successor_y_fast(int w, int x, unordered_map<int, map<int,int> > bst, vector
     return (a < b) ? a : b;
 }
 
-int predecessor_y_fast(int w, int x, unordered_map<int, map<int,int>> bst, vector<unordered_map<int,node*>> &x_fast){
+int predecessor_y_fast(int w, int x, unordered_map<int, map<int,int>> &bst, vector<unordered_map<int,node*>> &x_fast){
     struct node * suc = successor(x, w, x_fast) ; 
     struct node *pre = predecessor(x, w , x_fast) ;
     int a = -_pow(2,w) ;
@@ -319,7 +319,7 @@ int predecessor_y_fast(int w, int x, unordered_map<int, map<int,int>> bst, vecto
     return (a > b) ? a : b;
 }
 
-void insert_y_fast(int w, int x, int val, unordered_map<int, map<int,int> > bst, vector<unordered_map<int,node*>> &x_fast){
+void insert_y_fast(int w, int x, int val, unordered_map<int, map<int,int> > &bst, vector<unordered_map<int,node*>> &x_fast){
     struct node * suc = successor(x, w, x_fast) ;
     if(suc == NULL){
         insert_node(x, w, x_fast);
@@ -327,7 +327,6 @@ void insert_y_fast(int w, int x, int val, unordered_map<int, map<int,int> > bst,
     }
     else {
         int s = suc->data ;
-        cout << s << "\n" ;
         bst[s][x] = val; 
     }
 }
@@ -343,27 +342,24 @@ int main(){
     root->level=0;
     hash[0][0] = root ;
     
-    insert_node(5,w,hash);
-    insert_node(11,w,hash);
-    insert_node(12,w,hash);
-    insert_node(1,w,hash);
-    insert_node(6,w,hash);
-    insert_node(7,w,hash);
+    unordered_map<int,map<int,int>> ytrie;
+    insert_y_fast(w,5,2,ytrie,hash);
+    insert_y_fast(w,11,2,ytrie,hash);
+    insert_y_fast(w,12,2,ytrie,hash);
+    insert_y_fast(w,1,2,ytrie,hash);
 
-    struct node *temp = successor(2,w,hash);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
+    cout<<"Successor of the key 3 \n";
+    int key = successor_y_fast(w,3,ytrie,hash);
+    if(key!=-1){
+        cout<<key<<" "<<find_y_trie(w,key,ytrie,hash)<<"\n";
+    }
+    cout<<"Predecessor of the key 3 \n";
+    key = predecessor_y_fast(w,3,ytrie,hash);
+    if(key!=-1){
+        cout<<key<<" "<<find_y_trie(w,key,ytrie,hash)<<"\n";
     }
 
-    temp = predecessor(2,w,hash);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }
-    /*delete_node(5,w,hash) ;
-    temp = successor(2,w,hash);
-    if(temp!=NULL){
-        cout<<temp->data<<"\n";
-    }*/
+    return 0;
 }
 
 
