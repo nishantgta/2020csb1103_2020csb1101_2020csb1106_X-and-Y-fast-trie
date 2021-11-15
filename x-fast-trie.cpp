@@ -1,13 +1,18 @@
+// Including libraries
 #include<iostream>
 #include<unordered_map>
 #include<vector>
 using namespace std;
 
-struct node {
+// Defining the node for x-fast trie containing data, level
+// and a left pointer and a right pointer. It also has a default
+// constructor 
+struct node {   //node of struct type will represent the node in our trie data structure
     int data;
     int level;
     struct node * left, *right ;
     
+    //initialising node with default values
     node(){
         level=-1;
         left=NULL;
@@ -15,6 +20,7 @@ struct node {
     }
 };
 
+// Implementing power function 
 int _pow(int a, int b)
 {
    if(!b)return 1;
@@ -24,6 +30,7 @@ int _pow(int a, int b)
    return temp;
 }
 
+// This function will find the bitcount for given size of universe
 int bitCount(int x){
     int ans=0;
     while(x>0){
@@ -33,16 +40,21 @@ int bitCount(int x){
     return ans;
 }
 
+// This function will return the left child corresponding to a node
 int left_children(int x){
     return 2 * x ;
 }
 
+// This function will return the right child corresponding to a node
 int right_children(int x){
     return 2 * x + 1 ;
 }
 
+// This will return the leftmost node of the given node
 struct node* get_Leftmost_Node(struct node* root,int w){
+    // The function will keep traversing till it reaches the level w
     while(root->level!= w){
+        // If left is not NULL, it will go to the left child, else right child
         if(root->left==NULL){
             root=root->left;
         }
@@ -53,8 +65,11 @@ struct node* get_Leftmost_Node(struct node* root,int w){
     return root;
 }
 
+// This will return the rightmost node of the given node
 struct node* get_Rightmost_Node(struct node* root, int w){
+    // The function will keep traversing till it reaches the level w
     while(root->level!=w){
+        // If right is not NULL, it will go to the right child, else left child
         if(root->right != NULL){
             root = root->right ;
         }else{
@@ -64,6 +79,7 @@ struct node* get_Rightmost_Node(struct node* root, int w){
     return root ;
 }
 
+// This function find the key in the x-fast trie
 struct node* find(int x,int w,vector<unordered_map<int,node*>> &hash){
     if(hash[w].find(x) == hash[w].end()){
         return NULL;
@@ -71,6 +87,7 @@ struct node* find(int x,int w,vector<unordered_map<int,node*>> &hash){
     return hash[w][x];
 }
 
+// This function will return successor node in our trie corresponding to a given value
 struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
     int l, h, m, pre ;
     l = 0 ;
@@ -90,26 +107,27 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
         }
     }
     
-    if( temp == NULL || temp-> level == 0){
+    if( temp == NULL || temp-> level == 0){  //this means we have not yet created our trie
         return NULL;
     }
 
-    if(temp->level == w){
+    if(temp->level == w){  //reached at the end of our hash table
         return temp ;
     }
 
-    if((x / _pow(2, w - temp->level -1)) & 1){
+    if((x / _pow(2, w - temp->level -1)) & 1){  //choosing path after the common prefix
         temp = temp->right ;
     }else{
         temp = temp->left ;
     }
 
-    if(temp->data < x){
+    if(temp->data < x){   //if x is greater than temp, return the right node in our last level of hash
         return temp->right;
     }
-    return temp;
+    return temp;  //else return temp itself
 }
 
+// This function will return successor node in our trie corresponding to a given value
 struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
     int l, h, m, pre ;
     l = 0 ;
@@ -125,41 +143,49 @@ struct node* predecessor(int x, int w, vector<unordered_map<int,node*>> &hash){
         }
         else{
             l = m ;
-            temp = hash[m][pre] ;  //aage jaane ke liye root lena padega             
+            temp = hash[m][pre] ;  //if the common prefix is in the downward section, we wi            
         }
     }
     
+    //this means we have not yet created our trie
     if( temp == NULL || temp-> level == 0){
         return NULL;
     }
-
+    
+    //reached at the last level of our x-fast
     if(temp->level == w){
         return temp ;
     }
-
+    
+    //choosing path after the common prefix
     if((x / _pow(2, w - temp->level -1)) & 1){
         temp = temp->right ;
     }else{
         temp = temp->left ;
     }
-
+    
+    //if x is less than temp, return the left node in our last level of x-fast
     if(temp->data > x){
         return temp->left;
     }
+    //else return temp itself
     return temp;
 }
 
+// This function adds a key to the x-fast trie 
+// It will create a new node, find a suitable place for it in the existing trie and links other nodes to it.
 void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
-    struct node *hash_node = new node() ;
+    struct node *hash_node = new node() ;  //hash node will represent the node to be inserted
     hash_node->data = x ;
     hash_node->level = w ;   
     
-    struct node *p = predecessor(x,w,hash);
-    struct node *s = successor(x,w,hash);
+    struct node *p = predecessor(x,w,hash);  //p will have predecessor
+    struct node *s = successor(x,w,hash);    //s will have successor
     if(p != NULL){
         if(p->level != w){
-            cout << "Unexpected level" << "\n" ; //revisit this
+            cout << "Unexpected level" << "\n" ; 
         }
+        //To make links so that hash node can be inserted in the last level of hash, here we are attaching hash node to predecessor
         hash_node->right = p->right ;
         p->right = hash_node ;
         hash_node->left = p ;
@@ -167,14 +193,15 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
 
     if(s != NULL){
         if(s->level != w){
-            cout << "Unexpected level" << "\n" ; //revisit this
+            cout << "Unexpected level" << "\n" ; 
         }
+        //here we are attaching hash node to successor
         hash_node->left = s->left ;
         s->left = hash_node ;
         hash_node->right = s ;
     }
     
-    
+    //Starting from root and traverse down to the leaf while creating missing internal nodes
     int level = 1, pre;
     while(level!=w){
         pre = x / _pow(2,w-level);
@@ -203,13 +230,15 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
     //threading
     pre = x ;
     level = w - 1 ;
-    // level
+    // we are creating descendent pointers, if a node has a missing left or right child 
     while(level != 0){
         pre = pre/2 ;
         if(hash[level][pre]->left == NULL)
-            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;  
+            //if a node has a missing left child, then it will point to the left most leaf of its right child 
         else if(hash[level][pre]->right == NULL)
-            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;  
+            //if a node has a missing right child, then it will point to the right most leaf of its left child
         --level ;
     }   
 
@@ -223,10 +252,22 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
 
 void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     struct node* temp = find(x,w,hash);
-    struct node* s = successor(x,w,hash);
-    struct node* p = predecessor(x,w,hash);
-    p->right = s ;
-    s->left = p ;
+    struct node* s = temp->right;
+    struct node* p = temp->left;
+    if(p!=NULL){
+       if(s!=NULL){
+          p->right = s ;
+          s->left = p ;
+       }
+       else{
+           p->right=NULL;
+       }
+    }
+    else{
+       if(s!=NULL){
+           s->left=NULL;
+       }
+    }
 
     int pre = x ;
     int pprev;
@@ -237,12 +278,19 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         temp=hash[level+1][pprev];
         if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
         {   
+            temp=hash[level+1][pprev];
+            cout<<temp->data<<"\n";
+            cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
             hash[level+1][pprev]=NULL;
+            free(temp);
             //you have reached branch node :)
             break;
         }
         else{
+            temp=hash[level+1][pprev];
+            cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
             hash[level+1][pprev]=NULL;
+            free(temp);
         }
         --level ;
     } 
@@ -255,39 +303,71 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
     --level ;
     }   
-    
+    if(s!=NULL){
+    pre=s->data;
+    level=w-1;
+    while(level != 0){
+    pre = pre/2 ;
+    if(hash[level][pre]->left == NULL)
+        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+    else if(hash[level][pre]->right == NULL)
+        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+    --level ;
+    }   
+    }
+    if(p!=NULL){
+    pre=p->data;
+    level=w-1;
+    while(level != 0){
+    pre = pre/2 ;
+    if(hash[level][pre]->left == NULL)
+        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+    else if(hash[level][pre]->right == NULL)
+        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+    --level ;
+    }   
+    }
 }
 
 int main(){
+    // u is the universe size
+    // w is the bit count of u, no of of bits in u
     int w , u;
-    vector<unordered_map<int,node*>> hash;
+    
+    // Creating the x-fast trie
+    vector<unordered_map<int,node*>> xfast;
+    
+    // Taking input from user regarding size of universe
     cout<<"Enter the size of the universe"<<"\n";
     cin >> u ;
+    
+    // Initialising x-fast trie
     w= bitCount(u);
-    hash.assign(w+1,unordered_map<int,node*>());
+    xfast.assign(w+1,unordered_map<int,node*>());
     struct node* root = new node();
     root->level=0;
-    hash[0][0] = root ;
+    root->data=0;
+    xfast[0][0] = root ;
     
-    insert_node(5,w,hash);
-    insert_node(11,w,hash);
-    insert_node(12,w,hash);
-    insert_node(1,w,hash);
-    insert_node(6,w,hash);
-    insert_node(7,w,hash);
+    insert_node(5,w,xfast);
+    insert_node(11,w,xfast);
+    insert_node(12,w,xfast);
+    insert_node(1,w,xfast);
+    insert_node(6,w,xfast);
+    insert_node(7,w,xfast);
 
-    struct node *temp = successor(2,w,hash);
+    struct node *temp = successor(2,w,xfast);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
 
-    temp = predecessor(2,w,hash);
+    temp = predecessor(2,w,xfast);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
-    delete_node(5,w,hash);
-    temp = predecessor(2,w,hash);
+    /*delete_node(5,w,xfast);
+    temp = predecessor(2,w,xfast);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
-    }
+    }*/
 }
