@@ -103,7 +103,7 @@ struct node* successor(int x, int w, vector<unordered_map<int,node*>> &hash){
         }
         else{
             l = m ;
-            temp = hash[m][pre] ;  //aage jaane ke liye root lena padega             
+            temp = hash[m][pre] ;  //aage jaane ke liye root lena padega
         }
     }
     
@@ -208,6 +208,7 @@ void insert_node(int x, int w, vector<unordered_map<int,node*>> &hash){
         if(hash[level].find(pre) == hash[level].end()){
             struct node *inner = new node();
             inner->level = level;
+            inner->data = pre;
             hash[level][pre] = inner;
             if(pre & 1){
                 hash[level-1][pre/2]->right = inner;
@@ -279,8 +280,6 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         if(hash[level][pre]->left->data==2*hash[level][pre]->data && hash[level][pre]->right->data==(2*hash[level][pre]->data) + 1)
         {   
             temp=hash[level+1][pprev];
-            cout<<temp->data<<"\n";
-            cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
             hash[level+1][pprev]=NULL;
             free(temp);
             //you have reached branch node :)
@@ -288,7 +287,6 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
         }
         else{
             temp=hash[level+1][pprev];
-            cout<<pprev<<" "<<temp->data<<" "<<temp->level<<"\n";
             hash[level+1][pprev]=NULL;
             free(temp);
         }
@@ -296,36 +294,36 @@ void delete_node(int x,int w, vector<unordered_map<int,node*>> &hash){
     } 
     pre=pprev;
     while(level != 0){
-    pre = pre/2 ;
-    if(hash[level][pre]->left == NULL)
-        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-    else if(hash[level][pre]->right == NULL)
-        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
-    --level ;
-    }   
-    if(s!=NULL){
-    pre=s->data;
-    level=w-1;
-    while(level != 0){
-    pre = pre/2 ;
-    if(hash[level][pre]->left == NULL)
-        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-    else if(hash[level][pre]->right == NULL)
-        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
-    --level ;
-    }   
+        pre = pre/2 ;
+        if(hash[level][pre]->left == NULL)
+            hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
+        else if(hash[level][pre]->right == NULL)
+            hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
+        --level ;
     }
-    if(p!=NULL){
-    pre=p->data;
-    level=w-1;
-    while(level != 0){
-    pre = pre/2 ;
-    if(hash[level][pre]->left == NULL)
-        hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w) ;
-    else if(hash[level][pre]->right == NULL)
-        hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left,w) ;
-    --level ;
-    }   
+    if (s != NULL) {
+        pre = s->data;
+        level = w - 1;
+        while (level != 0) {
+            pre = pre / 2;
+            if (hash[level][pre]->left == NULL)
+                hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
+            else if (hash[level][pre]->right == NULL)
+                hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
+            --level;
+        }
+    }
+    if (p != NULL) {
+        pre = p->data;
+        level = w - 1;
+        while (level != 0) {
+            pre = pre / 2;
+            if (hash[level][pre]->left == NULL)
+                hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
+            else if (hash[level][pre]->right == NULL)
+                hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
+            --level;
+        }
     }
 }
 
@@ -365,9 +363,9 @@ int main(){
     if(temp!=NULL){
         cout<<temp->data<<"\n";
     }
-    /*delete_node(5,w,xfast);
-    temp = predecessor(2,w,xfast);
+    delete_node(7,w,xfast);
+    temp = predecessor(8,w,xfast);
     if(temp!=NULL){
         cout<<temp->data<<"\n";
-    }*/
+    }
 }
