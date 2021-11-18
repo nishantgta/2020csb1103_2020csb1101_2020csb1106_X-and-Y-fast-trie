@@ -377,8 +377,7 @@ int main() {
     vector<unordered_map<int, node*>> xfast;
 
     // Taking input from user regarding size of universe
-    cout << "Enter the size of the universe"
-         << "\n";
+    cout << "Enter the size of the universe: ";
     cin >> u;
 
     // Initialising x-fast trie
@@ -444,7 +443,7 @@ int main() {
             }
         }
         else if (c == 5) {
-            cout << "Enter element to be deleted";
+            cout << "Enter element to be deleted: ";
             cin >> n;
             if (find(n, w, xfast) == NULL) {
                 cout << "Element is not present\n";

@@ -217,6 +217,7 @@ void insert_node(int x, int w, vector<unordered_map<int, node*>>& xfast) {
         if (xfast[level].find(pre) == xfast[level].end()) {
             struct node* inner = new node();
             inner->level = level;
+            inner->data = pre;
             xfast[level][pre] = inner;
             if (pre & 1) {
                 xfast[level - 1][pre / 2]->right = inner;
@@ -245,9 +246,15 @@ void insert_node(int x, int w, vector<unordered_map<int, node*>>& xfast) {
         if (xfast[level][pre]->left == NULL)
             xfast[level][pre]->left = get_Leftmost_Node(xfast[level][pre]->right, w);
         //if a node has a missing left child, then it will point to the left most leaf of its right child
-        else if (xfast[level][pre]->right == NULL)
+        if (xfast[level][pre]->right == NULL)
             xfast[level][pre]->right = get_Rightmost_Node(xfast[level][pre]->left, w);
         //if a node has a missing right child, then it will point to the right most leaf of its left child
+        if (xfast[level][pre]->left->level != xfast[level][pre]->level + 1) {
+            xfast[level][pre]->left = get_Leftmost_Node(xfast[level][pre]->right, w);
+        }
+        if (xfast[level][pre]->right->level != xfast[level][pre]->level + 1) {
+            xfast[level][pre]->right = get_Rightmost_Node(xfast[level][pre]->left, w);
+        }
         --level;
     }
 
@@ -255,6 +262,12 @@ void insert_node(int x, int w, vector<unordered_map<int, node*>>& xfast) {
         xfast[0][0]->left = get_Leftmost_Node(xfast[0][0]->right, w);
     }
     if (xfast[0][0]->right == NULL) {
+        xfast[0][0]->right = get_Rightmost_Node(xfast[0][0]->left, w);
+    }
+    if (xfast[0][0]->left->level != xfast[0][0]->level + 1) {
+        xfast[0][0]->left = get_Leftmost_Node(xfast[0][0]->right, w);
+    }
+    if (xfast[0][0]->right->level != xfast[0][0]->level + 1) {
         xfast[0][0]->right = get_Rightmost_Node(xfast[0][0]->left, w);
     }
 }
@@ -269,7 +282,7 @@ int successor_bst(int x, map<int, int> bst) {
     map<int, int>::iterator temp = bst.lower_bound(x);
     // If we reach the end of bst, it means successor of element is not present
     if (temp == bst.end()) {
-        return -1;
+        return INT_MAX;
     }
     else {
         return temp->first;
@@ -308,8 +321,8 @@ int successor_y_fast(int w, int x, unordered_map<int, map<int, int>>& bst, vecto
     // and return the smaller value from both of them.
     struct node* suc = successor(x, w, x_fast);
     struct node* pre = predecessor(x, w, x_fast);
-    int a = _pow(2, w);
-    int b = _pow(2, w);
+    int a = INT_MAX;
+    int b = INT_MAX;
     if (suc != NULL)
         a = successor_bst(x, bst[suc->data]);
     if (pre != NULL)
@@ -324,8 +337,8 @@ int predecessor_y_fast(int w, int x, unordered_map<int, map<int, int>>& bst, vec
     // and return the larger value from both of them.
     struct node* suc = successor(x, w, x_fast);
     struct node* pre = predecessor(x, w, x_fast);
-    int a = -_pow(2, w);
-    int b = -_pow(2, w);
+    int a = -1;
+    int b = -1;
     if (suc != NULL)
         a = predecessor_bst(x, bst[suc->data]);
     if (pre != NULL)
@@ -355,6 +368,7 @@ int main() {
     xfast.assign(w + 1, unordered_map<int, node*>());
     struct node* root = new node();
     root->level = 0;
+    root->data = 0;
     xfast[0][0] = root;
 
     unordered_map<int, map<int, int>> ytrie;
@@ -395,7 +409,7 @@ int main() {
             cin >> n;
             cout << "Successor of the key " << n << ": ";
             int key = successor_y_fast(w, n, ytrie, xfast);
-            if (key != -1) {
+            if (key != INT_MAX) {
                 cout << key << "\n";
             }
             else {
