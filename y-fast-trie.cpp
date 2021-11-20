@@ -4,6 +4,7 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#define INT_MAX 2147483647
 using namespace std;
 
 // Defining the node for x-fast trie containing data, level
@@ -57,7 +58,7 @@ struct node* get_Leftmost_Node(struct node* root, int w) {
     // The function will keep traversing till it reaches the level w
     while (root->level != w) {
         // If left is not NULL, it will go to the left child, else right child
-        if (root->left == NULL) {
+        if (root->left != NULL) {
             root = root->left;
         }
         else {
@@ -430,7 +431,7 @@ int main() {
             break;
         }
         else {
-            cout << "Invalid Input";
+            cout << "Invalid Input\n";
         }
     }
     return 0;

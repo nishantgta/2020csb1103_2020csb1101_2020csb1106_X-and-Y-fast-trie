@@ -56,7 +56,7 @@ struct node* get_Leftmost_Node(struct node* root, int w) {
     // The function will keep traversing till it reaches the level w
     while (root->level != w) {
         // If left is not NULL, it will go to the left child, else right child
-        if (root->left == NULL) {
+        if (root->left != NULL) {
             root = root->left;
         }
         else {
@@ -293,13 +293,20 @@ void delete_node(int x, int w, vector<unordered_map<int, node*>>& hash) {
     int pre = x;
     int pprev;
     int level = w - 1;
-    while (level != 0) {
+    while (level >= 0) {
         pprev = pre;
         pre = pre / 2;
         temp = hash[level + 1][pprev];
-        if (hash[level][pre]->left->data == 2 * hash[level][pre]->data && hash[level][pre]->right->data == (2 * hash[level][pre]->data) + 1) {
+        // if (hash[level][pre]->left->data == 2 * hash[level][pre]->data && hash[level][pre]->right->data == (2 * hash[level][pre]->data) + 1) {
+        //     int a = 0;
+        // }
+        if (hash[level][pre]->left->level == (hash[level][pre]->level + 1) && hash[level][pre]->right->level == (hash[level][pre]->level + 1) &&
+                (hash[level][pre]->left->data == 2 * hash[level][pre]->data && hash[level][pre]->right->data == (2 * hash[level][pre]->data) + 1)) {
             temp = hash[level + 1][pprev];
-            hash[level + 1][pprev] = NULL;
+            if(pprev & 1)
+                hash[level][pre]->right = NULL;
+            else
+                hash[level][pre]->left = NULL;
             hash[level + 1].erase(pprev);
             free(temp);
             //you have reached branch node :)
@@ -307,24 +314,26 @@ void delete_node(int x, int w, vector<unordered_map<int, node*>>& hash) {
         }
         else {
             temp = hash[level + 1][pprev];
-            hash[level + 1][pprev] = NULL;
+            if(pprev & 1)
+                hash[level][pre]->right = NULL;
+            else
+                hash[level][pre]->left = NULL;
             hash[level + 1].erase(pprev);
             free(temp);
         }
         --level;
     }
-    level--;
     pre = pprev;
-    while (level != 0) {
+    while (level > 0) {
         pre = pre / 2;
         if (hash[level][pre]->left == NULL)
             hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
         if (hash[level][pre]->right == NULL)
             hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
-        if (hash[level][pre]->left->level != hash[level][pre]->level + 1) {
+        if (hash[level][pre]->left->level != hash[level][pre]->level + 1 && (hash[level][pre]->left->data != (hash[level][pre]->data*2))) {
             hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
         }
-        if (hash[level][pre]->right->level != hash[level][pre]->level + 1) {
+        if (hash[level][pre]->right->level != hash[level][pre]->level + 1 && (hash[level][pre]->right->data != (hash[level][pre]->data*2 + 1))) {
             hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
         }
         --level;
@@ -338,10 +347,10 @@ void delete_node(int x, int w, vector<unordered_map<int, node*>>& hash) {
                 hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
             if (hash[level][pre]->right == NULL)
                 hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
-            if (hash[level][pre]->left->level != hash[level][pre]->level + 1) {
+            if (hash[level][pre]->left->level != hash[level][pre]->level + 1 && (hash[level][pre]->left->data != (hash[level][pre]->data*2))) {
                 hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
             }
-            if (hash[level][pre]->right->level != hash[level][pre]->level + 1) {
+            if (hash[level][pre]->right->level != hash[level][pre]->level + 1 && (hash[level][pre]->right->data != (hash[level][pre]->data*2 + 1))) {
                 hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
             }
             --level;
@@ -356,16 +365,15 @@ void delete_node(int x, int w, vector<unordered_map<int, node*>>& hash) {
                 hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
             if (hash[level][pre]->right == NULL)
                 hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
-            if (hash[level][pre]->left->level != hash[level][pre]->level + 1) {
+            if (hash[level][pre]->left->level != hash[level][pre]->level + 1 && (hash[level][pre]->left->data != (hash[level][pre]->data*2))) {
                 hash[level][pre]->left = get_Leftmost_Node(hash[level][pre]->right, w);
             }
-            if (hash[level][pre]->right->level != hash[level][pre]->level + 1) {
+            if (hash[level][pre]->right->level != hash[level][pre]->level + 1 && (hash[level][pre]->right->data != (hash[level][pre]->data*2 + 1))) {
                 hash[level][pre]->right = get_Rightmost_Node(hash[level][pre]->left, w);
             }
             --level;
         }
     }
-    1;
 }
 
 int main() {
